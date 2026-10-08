@@ -1,0 +1,488 @@
+:root {
+    --bg-dark: #090d16;
+    --card-bg: rgba(17, 24, 39, 0.75);
+    --border-glass: rgba(255, 255, 255, 0.1);
+    --boy-color: #00f2fe;
+    --girl-color: #ff2a8d;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --radius: 24px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* FONDO DINÁMICO CANVAS */
+#bgCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* NOTIFICACIÓN TOAST */
+#toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid var(--border-glass);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+}
+#toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+#toastIcon { color: var(--boy-color); font-size: 1.1rem; }
+
+/* BOTÓN MÚSICA */
+.music-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-glass);
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 99;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: transform 0.2s, border-color 0.2s;
+}
+.music-btn:hover {
+    transform: scale(1.08);
+    border-color: var(--girl-color);
+}
+
+/* CONTENEDOR MÓVIL PRINCIPAL */
+.mobile-wrapper {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    z-index: 1;
+}
+
+/* SECCIONES Y TARJETAS ESTILO GLASS/NEON */
+section {
+    width: 100%;
+}
+
+.section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-main);
+}
+.section-title i {
+    background: linear-gradient(135deg, var(--boy-color), var(--girl-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* HERO CARD */
+.hero {
+    background: var(--card-bg);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 35px 20px;
+    text-align: center;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 4px;
+    background: linear-gradient(90deg, var(--boy-color), var(--girl-color));
+}
+
+.badge-event {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    color: var(--text-muted);
+}
+
+.hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #fff 30%, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero h1 span {
+    background: linear-gradient(135deg, var(--boy-color), var(--girl-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: block;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 25px;
+}
+
+/* CUENTA REGRESIVA */
+.countdown-box {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.time-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.time-unit span {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+}
+
+.time-unit small {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+}
+
+/* VOTACIÓN / POLL INTERACTIVO DUO */
+.vote-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.vote-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 20px 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
+}
+
+.vote-card.boy:hover {
+    border-color: var(--boy-color);
+    box-shadow: 0 0 25px rgba(0, 242, 254, 0.2);
+    transform: translateY(-4px);
+}
+
+.vote-card.girl:hover {
+    border-color: var(--girl-color);
+    box-shadow: 0 0 25px rgba(255, 42, 141, 0.2);
+    transform: translateY(-4px);
+}
+
+.vote-card i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+.vote-card.boy i { color: var(--boy-color); }
+.vote-card.girl i { color: var(--girl-color); }
+
+.vote-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.vote-card p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.vote-count {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.05);
+    display: inline-block;
+}
+
+/* PASE VIP */
+.vip-pass {
+    background: var(--card-bg);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 25px 20px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    position: relative;
+}
+.vip-code {
+    font-family: monospace;
+    background: rgba(0,0,0,0.4);
+    border: 1px dashed var(--border-glass);
+    color: #fff;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    margin: 15px 0 10px 0;
+}
+
+/* TARJETA DE INFORMACIÓN */
+.info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 22px;
+    backdrop-filter: blur(12px);
+}
+
+.info-item {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+.info-item:last-child { margin-bottom: 0; }
+
+.info-item i {
+    font-size: 1.2rem;
+    margin-top: 2px;
+    background: linear-gradient(135deg, var(--boy-color), var(--girl-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.info-item h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.info-item p {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.btn-map {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-glass);
+    border-radius: 14px;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.btn-map:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.3);
+}
+
+/* ITINERARIO */
+.timeline {
+    background: var(--card-bg);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 22px;
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 15px;
+    position: relative;
+    padding-left: 15px;
+    border-left: 2px solid rgba(255,255,255,0.1);
+}
+
+.timeline-time {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--boy-color);
+    min-width: 65px;
+}
+
+.timeline-title {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+/* FORMULARIO RSVP */
+.rsvp-form {
+    background: var(--card-bg);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 22px;
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.form-control {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    padding: 12px 15px;
+    color: white;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.form-control:focus {
+    border-color: var(--boy-color);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--boy-color), var(--girl-color));
+    border: none;
+    border-radius: 14px;
+    color: #090d16;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+    box-shadow: 0 8px 20px rgba(0,242,254,0.2);
+}
+.btn-submit:hover {
+    opacity: 0.95;
+    transform: scale(1.02);
+}
+
+/* TARJETA DE ÉXITO */
+.success-card {
+    display: none;
+    background: var(--card-bg);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius);
+    padding: 30px 20px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+}
+.success-card i {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, var(--boy-color), var(--girl-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+}
+.success-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+.success-card p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+.btn-reset {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-glass);
+    padding: 10px 20px;
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+footer a { color: var(--boy-color); text-decoration: none; }
